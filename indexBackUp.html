@@ -69,7 +69,7 @@
             <a id="downloadLink" download="design.png" style="display: none;">
                 <button>Download your design</button>
             </a>
-            <button id="shareButton" style="display: none;">Share design</button>
+            <button id="copyButton" style="display: none;">Copy design</button>
         </div>
     </div>
 
@@ -121,13 +121,13 @@
                             const nameY = canvasHeight * 0.68;  // Y position for name
                             ctx.fillText(fullName, nameX, nameY);
 
-                            // Generate download link and display buttons
+                            // Generate download link
                             canvas.style.display = 'block';
                             const downloadLink = document.getElementById('downloadLink');
-                            const shareBtn = document.getElementById('shareButton');
+                            const copyBtn = document.getElementById('copyButton');
                             downloadLink.href = canvas.toDataURL('image/png');
                             downloadLink.style.display = 'block';
-                            shareBtn.style.display = 'block';
+                            copyBtn.style.display = 'block';
                         };
                         profileImg.src = e.target.result;
                     };
@@ -136,27 +136,12 @@
             };
         });
 
-        document.getElementById('shareButton').addEventListener('click', function () {
+        document.getElementById('copyButton').addEventListener('click', function () {
             const canvas = document.getElementById('designCanvas');
             canvas.toBlob(function (blob) {
-                const file = new File([blob], 'design.png', { type: 'image/png' });
-
-                // Check if Web Share API is supported
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: 'Design',
-                        text: 'Check out this design!',
-                    })
-                    .then(() => {
-                        console.log('Design shared successfully!');
-                    })
-                    .catch((error) => {
-                        console.error('Error sharing the design:', error);
-                    });
-                } else {
-                    alert('Sharing not supported on this device.');
-                }
+                const item = new ClipboardItem({ 'image/png': blob });
+                navigator.clipboard.write([item]);
+                alert('Design copied to clipboard!');
             });
         });
     </script>
