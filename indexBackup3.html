@@ -86,16 +86,14 @@
             const templateWidth = 1290;
             const templateHeight = 898;
 
-            // Handle high-DPI (retina) displays
-            const pixelRatio = window.devicePixelRatio || 1;
-            canvas.width = templateWidth * pixelRatio;
-            canvas.height = templateHeight * pixelRatio;
-            ctx.scale(pixelRatio, pixelRatio);
-
             // Load the PNG template
             const template = new Image();
             template.src = 'your-design.png';  // Replace with your PNG design path
             template.onload = function () {
+                // Set the canvas to the original dimensions of the PNG
+                canvas.width = templateWidth;
+                canvas.height = templateHeight;
+
                 // Draw the template onto the canvas
                 ctx.drawImage(template, 0, 0, templateWidth, templateHeight);
 
@@ -111,7 +109,7 @@
                             const picWidth = templateWidth * 0.3;  // 30% of template width
                             const picHeight = templateHeight * 0.5;  // 50% of template height
 
-                            // Draw the profile picture at its full resolution
+                            // Draw the profile picture
                             ctx.drawImage(profileImg, picX, picY, picWidth, picHeight);
 
                             // Overlay the name (scaled to template width)
@@ -125,7 +123,7 @@
                             canvas.style.display = 'block';
                             const downloadLink = document.getElementById('downloadLink');
                             const shareBtn = document.getElementById('shareButton');
-                            downloadLink.href = canvas.toDataURL('image/png', 1.0);  // Max quality PNG
+                            downloadLink.href = canvas.toDataURL('image/png');
                             downloadLink.style.display = 'block';
                             shareBtn.style.display = 'block';
                         };
