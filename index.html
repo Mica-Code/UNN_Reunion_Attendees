@@ -87,15 +87,19 @@
             const templateHeight = 898;
 
             // Handle high-DPI (retina) displays
-            const pixelRatio = window.devicePixelRatio || 1;
-            canvas.width = templateWidth * pixelRatio;
-            canvas.height = templateHeight * pixelRatio;
-            ctx.scale(pixelRatio, pixelRatio);
+            // const pixelRatio = window.devicePixelRatio || 1;
+            // canvas.width = templateWidth * pixelRatio;
+            // canvas.height = templateHeight * pixelRatio;
+            // ctx.scale(pixelRatio, pixelRatio);
+           
+            
 
             // Load the PNG template
             const template = new Image();
             template.src = 'your-design.png';  // Replace with your PNG design path
             template.onload = function () {
+                canvas.width = templateWidth;
+                canvas.height = templateHeight;
                 // Draw the template onto the canvas
                 ctx.drawImage(template, 0, 0, templateWidth, templateHeight);
 
