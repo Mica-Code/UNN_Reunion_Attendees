@@ -82,20 +82,22 @@
             const canvas = document.getElementById('designCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Original resolution of the PNG template
-            const templateWidth = 1290;
-            const templateHeight = 898;
-
             // Load the PNG template
             const template = new Image();
             template.src = 'your-design.png';  // Replace with your PNG design path
             template.onload = function () {
-                // Set the canvas to the original dimensions of the PNG
-                canvas.width = templateWidth;
-                canvas.height = templateHeight;
+                // Get the screen width and adjust canvas size proportionally
+                const screenWidth = window.innerWidth;
+                const aspectRatio = template.height / template.width;
+                const canvasWidth = Math.min(screenWidth * 0.9, 600);  // Set max width for larger screens
+                const canvasHeight = canvasWidth * aspectRatio;
+
+                // Set canvas size
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
 
                 // Draw the template onto the canvas
-                ctx.drawImage(template, 0, 0, templateWidth, templateHeight);
+                ctx.drawImage(template, 0, 0, canvasWidth, canvasHeight);
 
                 // Load and draw the profile picture
                 if (profilePicInput.files && profilePicInput.files[0]) {
@@ -103,20 +105,20 @@
                     reader.onload = function (e) {
                         const profileImg = new Image();
                         profileImg.onload = function () {
-                            // Coordinates and size for profile picture based on original canvas size
-                            const picX = templateWidth * 0.6;  // 60% from the left
-                            const picY = templateHeight * 0.1;  // 10% from the top
-                            const picWidth = templateWidth * 0.3;  // 30% of template width
-                            const picHeight = templateHeight * 0.5;  // 50% of template height
+                            // Scale coordinates and size for profile picture based on canvas size
+                            const picX = canvasWidth * 0.6;  // 20% from the left
+                            const picY = canvasHeight * 0.1;  // 30% from the top
+                            const picWidth = canvasWidth * 0.3;  // 20% of canvas width
+                            const picHeight = canvasHeight * 0.5;  // 20% of canvas height
 
                             // Draw the profile picture
                             ctx.drawImage(profileImg, picX, picY, picWidth, picHeight);
 
-                            // Overlay the name (scaled to template width)
-                            ctx.font = `${templateWidth * 0.05}px Arial`;  // Font size scaled to template width
+                            // Overlay the name (also scaled)
+                            ctx.font = `${canvasWidth * 0.05}px Arial`;  // Font size scaled to canvas width
                             ctx.fillStyle = "#000";  // Text color
-                            const nameX = templateWidth * 0.45;  // X position for name
-                            const nameY = templateHeight * 0.68;  // Y position for name
+                            const nameX = canvasWidth * 0.45;  // X position for name
+                            const nameY = canvasHeight * 0.68;  // Y position for name
                             ctx.fillText(fullName, nameX, nameY);
 
                             // Generate download link and display buttons
@@ -143,6 +145,8 @@
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     navigator.share({
                         files: [file],
+                        // title: 'Design',
+                        // text: 'Check out this design!',
                     })
                     .then(() => {
                         console.log('Design shared successfully!');
@@ -153,7 +157,7 @@
                 } else {
                     alert('Sharing not supported on this device.');
                 }
-            }, 'image/png', 1.0); // Ensures maximum quality for the exported image
+            });
         });
     </script>
 </body>
