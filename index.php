@@ -1,3 +1,24 @@
+<?php
+
+include_once('db.php');
+
+$sql = "SELECT * FROM students Order by FullName";
+//you can do it like this 
+$result = $conn->query($sql);
+
+$getAllData = [];
+while ($row = $result->fetch_assoc()) {
+    $getAllData[$row['studentID']] = $row['FullName'];
+}
+
+
+//echo "<script>console.log('".$result->num_rows."')</script>";
+
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +45,7 @@
         form {
             margin-bottom: 20px;
         }
-        input[type="text"], input[type="file"] {
+        input[type="text"], input[type="file"], select {
             display: block;
             margin: 10px auto;
             padding: 10px;
@@ -56,12 +77,29 @@
             gap: 10px;
         }
     </style>
+    <!-- jQuery 3.x -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- Your existing styles go here -->
     </head>
 <body>
     <div class="container">
         <form id="attendeeForm">
-            <input type="text" id="fullName" placeholder="First, Last Name" required>
+            <input type="text" id="fullName" placeholder="First, Last Name" style="display:none">
+            <p style="color:red; font-size:10px;" id="note"><strong>Note:</strong> If your name is not in the list click the Add New Button</p>
+            <select style="/*width: 88%;*/" class="attNames" id="attNames" required>
+            <option value=""></option>
+                <?php
+                    
+                    foreach ($getAllData as $key => $value): ?>
+                        <option value="<?= $key; ?>">
+                            <?= $value; ?>
+                        </option>
+                    <?php endforeach; 
+
+                ?>
+            </select><button type="button" id="addNew">Add New</button>
             <input type="file" id="profilePic" accept="image/*" required>
             <button type="submit">Generate Design</button>
         </form>
@@ -81,6 +119,7 @@
     e.preventDefault();
 
     const fullName = document.getElementById('fullName').value;
+    const attNames = document.getElementById('attNames').value;
     const profilePicInput = document.getElementById('profilePic');
     const canvas = document.getElementById('designCanvas');
     const ctx = canvas.getContext('2d');
@@ -88,6 +127,7 @@
     // Collect form data to send to PHP
     const formData = new FormData();
     formData.append('fullName', fullName);
+    formData.append('attNames', attNames);
     formData.append('profilePic', profilePicInput.files[0]);
 
     fetch('design_generator.php', {
@@ -98,6 +138,7 @@
     .then(data => {
         const uniqueID = data.uniqueID;
         const qrCodePath = data.qrCodePath;
+        const displayName = data.displayName;
 
         // Load the template image
         const template = new Image();
@@ -129,7 +170,7 @@
                         // ctx.font = `${templateWidth * 0.05}px Arial`;
                         ctx.font = `48px Arial`;
                         ctx.fillStyle = "#000";
-                        ctx.fillText(fullName, templateWidth * 0.55, templateHeight * 0.68);
+                        ctx.fillText(displayName, templateWidth * 0.55, templateHeight * 0.68);
 
                         // Draw the unique ID
                         ctx.fillText(`ID: ${uniqueID}`, templateWidth * 0.55, templateHeight * 0.75);
@@ -158,7 +199,7 @@
             }
         };
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.log( error));
 });
 
 document.getElementById('shareButton').addEventListener('click', function () {
@@ -182,6 +223,47 @@ document.getElementById('shareButton').addEventListener('click', function () {
         }
     }, 'image/png', 1.0); // Ensures maximum quality for the exported image
 });
+
+//Searchable Select
+
+$(document).ready(function() {
+    $('.attNames').select2();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('addNew').addEventListener('click', () => {
+        // Hide the button, <p>, and select elements
+        document.getElementById('addNew').style.display = 'none';
+        document.getElementById('note').style.display = 'none';
+
+        // Hide the Select2 dropdown
+        document.getElementById('attNames').removeAttribute('required');
+        $('#attNames').select2('destroy'); // Destroy Select2 instance
+        document.getElementById('attNames').style.display = 'none';
+
+        // Show the input field
+        const inputField = document.getElementById('fullName');
+        inputField.style.display = 'block';
+        inputField.setAttribute('required', '');
+    });
+});
+
+
+// document.getElementById('addNew').addEventListener('click', ()=>{
+
+//     // let isTextDisplayed = document.getElementById('inputId').style.display;
+
+//     // if(isTextDisplayed = 'none'){
+//         document.getElementById('addNew').style.display = 'none';
+//         document.getElementById('note').style.display = 'none';
+//         document.getElementById('attName').style.display = 'none';
+
+//         // Show the input field
+//         document.getElementById('fullName').style.display = 'block';
+//     // }
+    
+
+// });
 
     </script>
 </body>
