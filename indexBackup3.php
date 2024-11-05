@@ -181,31 +181,24 @@ while ($row = $result->fetch_assoc()) {
     }
 
     const picX = templateWidth * 0.6; // Adjust as needed
-    const picY = templateHeight * 0.05;
+    const picY = templateHeight * 0.1;
 
     ctx.drawImage(profileImg, picX, picY, picWidth, picHeight);
 
     // Draw name under profile picture
     ctx.font = `48px Arial`;
     ctx.fillStyle = "#000";
-    // Set a reasonable max width for the text wrapping
-    const maxTextWidth = templateWidth * 0.3; // Adjust width for wrapping as needed
-    const textX = templateWidth * 0.55;
-    const textY = templateHeight * 0.61;
-
-    // Call wrapText with corrected max width
-    wrapText(ctx, displayName, textX, textY, maxTextWidth, 50); // Line height set to 50px
-    //ctx.fillText(displayName, templateWidth * 0.55, templateHeight * 0.68);
+    ctx.fillText(displayName, templateWidth * 0.55, templateHeight * 0.68);
 
     // Draw the unique ID
-    ctx.fillText(`ID: ${uniqueID}`, templateWidth * 0.55, templateHeight * 0.73);
+    ctx.fillText(`ID: ${uniqueID}`, templateWidth * 0.55, templateHeight * 0.75);
 
     // Load and draw QR code
     const qrCodeImg = new Image();
     qrCodeImg.src = qrCodePath;
     qrCodeImg.onload = function () {
         const qrX = templateWidth * 0.7; // Adjust as needed
-        const qrY = templateHeight * 0.68   ;
+        const qrY = templateHeight * 0.7;
         const qrSize = templateWidth * 0.1;
         ctx.drawImage(qrCodeImg, qrX, qrY, qrSize, qrSize);
 
@@ -227,27 +220,6 @@ while ($row = $result->fetch_assoc()) {
     })
     .catch(error => console.log( error));
 });
-
-
-function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-    const words = text.trim().split(' ');
-    
-    if (words.length <= 2) {
-        // Only one or two words, display in a single line
-        ctx.fillText(text, x, y);
-    } else {
-        // More than two words, split the text into lines
-        let firstLine = words.slice(0, 2).join(' '); // Take the first two words for the first line
-        let secondLine = words.slice(2).join(' ');   // Remaining words for the second line
-
-        // Draw the first line
-        ctx.fillText(firstLine, x, y);
-
-        // Draw the second line below
-        ctx.fillText(secondLine, x, y + lineHeight);
-    }
-}
-
 
 document.getElementById('shareButton').addEventListener('click', function () {
     const canvas = document.getElementById('designCanvas');
